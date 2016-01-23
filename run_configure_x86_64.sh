@@ -1,10 +1,27 @@
 #!/bin/bash
 
+if [ -z $CUSTOM_PLATFORM_CONFIG ]; then
+PLATFORM_CONFIG='../ios_platform_config.sh'
+else
+PLATFORM_CONFIG=$CUSTOM_PLATFORM_CONFIG
+fi
+
+MY_ARCH='x86_64'
+MY_CC=$($PLATFORM_CONFIG --cc)
+MY_CFLAGS=$($PLATFORM_CONFIG --cflags)
+MY_MINVERSION=$($PLATFORM_CONFIG --minversion)
+MY_LIBXML_INC=$(xml2-config --cflags)
+MY_SYSROOT=$($PLATFORM_CONFIG --sysroot-sim)
+MY_AR=$($PLATFORM_CONFIG --ar)
+
+CFLAGS_COMPOSITE="-arch $MY_ARCH $MY_CFLAGS -miphoneos-version-min=$MY_MINVERSION $MY_LIBXML_INC -isysroot $MY_SYSROOT"
+LDFLAGS_COMPOSITE="-arch $MY_ARCH -isysroot $MY_SYSROOT -miphoneos-version-min=$MY_MINVERSION"
+
 ./configure --without-zlib --without-png --without-bzip2 \
 '--prefix=/usr/local/iPhone' '--host=arm-apple-darwin' '--enable-static=yes' \
 '--enable-shared=no' \
-'CC=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang' \
-'CFLAGS=-arch x86_64 -pipe -std=c99 -fembed-bitcode-marker -fpascal-strings -O2 -Wall -Wextra -Wcast-align -Wno-trigraphs -Wno-unused-parameter -Wno-format -Wno-unused-function -Wno-sign-compare -Wreturn-type -Wunused-variable -fmessage-length=0 -fvisibility=hidden -fexceptions -fasm-blocks -mios-simulator-version-min=6.0 -I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/usr/include/libxml2/ -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk' \
-'AR=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar' \
-'LDFLAGS=-arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/ -mios-simulator-version-min=6.0'
+CC=$MY_CC \
+CFLAGS="$CFLAGS_COMPOSITE" \
+AR=$MY_AR \
+LDFLAGS="$LDFLAGS_COMPOSITE"
 

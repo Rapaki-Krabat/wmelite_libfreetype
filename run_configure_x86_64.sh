@@ -8,7 +8,7 @@ fi
 
 MY_ARCH='x86_64'
 MY_CC=$($PLATFORM_CONFIG --cc)
-MY_CFLAGS=$($PLATFORM_CONFIG --cflags)
+MY_CFLAGS=$($PLATFORM_CONFIG --cflags_sim)
 MY_MINVERSION=$($PLATFORM_CONFIG --minversion)
 MY_LIBXML_INC=$(xml2-config --cflags)
 MY_SYSROOT=$($PLATFORM_CONFIG --sysroot-sim)

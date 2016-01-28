@@ -13,6 +13,8 @@ MY_MINVERSION=$($PLATFORM_CONFIG --minversion)
 MY_LIBXML_INC=$(xml2-config --cflags)
 MY_SYSROOT=$($PLATFORM_CONFIG --sysroot-phone)
 MY_AR=$($PLATFORM_CONFIG --ar)
+MY_STRIP=$($PLATFORM_CONFIG --strip)
+MY_RANLIB=$($PLATFORM_CONFIG --ranlib)
 
 CFLAGS_COMPOSITE="-arch $MY_ARCH $MY_CFLAGS -miphoneos-version-min=$MY_MINVERSION $MY_LIBXML_INC -isysroot $MY_SYSROOT"
 LDFLAGS_COMPOSITE="-arch $MY_ARCH -isysroot $MY_SYSROOT -miphoneos-version-min=$MY_MINVERSION"
@@ -23,5 +25,7 @@ LDFLAGS_COMPOSITE="-arch $MY_ARCH -isysroot $MY_SYSROOT -miphoneos-version-min=$
 CC=$MY_CC \
 CFLAGS="$CFLAGS_COMPOSITE" \
 AR=$MY_AR \
+STRIP=$MY_STRIP \
+RANLIB=$MY_RANLIB \
 LDFLAGS="$LDFLAGS_COMPOSITE"
 

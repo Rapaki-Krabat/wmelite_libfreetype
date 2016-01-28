@@ -37,4 +37,4 @@ cp -r include/* $($CUSTOM_PLATFORM_CONFIG --installdir)/libfreetype/include/
 
 mkdir -p $($CUSTOM_PLATFORM_CONFIG --installdir)/libfreetype/libcombined/
 rm -rf $($CUSTOM_PLATFORM_CONFIG --installdir)/libfreetype/libcombined/*
-cp Release-iphoneos/libfreetype.a $($CUSTOM_PLATFORM_CONFIG --installdir)/libfreetype/libcombined/*
+cp Release-iphoneos/libfreetype.a $($CUSTOM_PLATFORM_CONFIG --installdir)/libfreetype/libcombined/

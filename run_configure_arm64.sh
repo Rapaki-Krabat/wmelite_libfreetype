@@ -22,6 +22,7 @@ LDFLAGS_COMPOSITE="-arch $MY_ARCH -isysroot $MY_SYSROOT -miphoneos-version-min=$
 ./configure --without-zlib --without-png --without-bzip2 \
 '--prefix=/usr/local/iPhone' '--host=arm-apple-darwin' '--enable-static=yes' \
 '--enable-shared=no' \
+'--with-harfbuzz=no' \
 CC=$MY_CC \
 CFLAGS="$CFLAGS_COMPOSITE" \
 AR=$MY_AR \

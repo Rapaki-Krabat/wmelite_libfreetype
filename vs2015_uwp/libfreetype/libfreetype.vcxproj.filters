@@ -54,5 +54,6 @@
     <ClInclude Include="..\..\include\config\ftmodule.h" />
     <ClInclude Include="..\..\include\config\ftoption.h" />
     <ClInclude Include="..\..\include\config\ftstdlib.h" />
+    <ClInclude Include="..\..\include\freetype.h" />
   </ItemGroup>
 </Project>

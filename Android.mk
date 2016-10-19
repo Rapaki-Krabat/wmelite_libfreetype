@@ -173,9 +173,6 @@ src/smooth/ftspic.c \
 src/smooth/smooth.c \
 src/tools/apinames.c \
 src/tools/ftrandom/ftrandom.c \
-# src/tools/test_afm.c \
-# src/tools/test_bbox.c \
-# src/tools/test_trig.c \
 src/truetype/truetype.c \
 src/truetype/ttdriver.c \
 src/truetype/ttgload.c \
@@ -217,6 +214,9 @@ src/gzip/ftgzip.c \
 #src/smooth/ftsmooth.c \
 #src/raster/ftrend1.c \
 #src/sfnt/ttsbit0.c \
+# src/tools/test_afm.c \
+# src/tools/test_bbox.c \
+# src/tools/test_trig.c \
 
 
 LOCAL_C_INCLUDES += \

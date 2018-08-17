@@ -392,14 +392,19 @@ FT_BEGIN_HEADER
 
 #ifndef FT_EXPORT
 
-#ifdef __cplusplus
-#define FT_EXPORT( x )  extern "C"  x
+#ifdef FREETYPE_BUILD_SHARED_LIBRARY
+#define FREETYPE_EXPORT_SHARED  __declspec(dllexport)
 #else
-#define FT_EXPORT( x )  extern  x
+#define FREETYPE_EXPORT_SHARED
+#endif
+
+#ifdef __cplusplus
+#define FT_EXPORT( x )  FREETYPE_EXPORT_SHARED extern "C"  x
+#else
+#define FT_EXPORT( x )  FREETYPE_EXPORT_SHARED extern  x
 #endif
 
 #endif /* !FT_EXPORT */
-
 
 #ifndef FT_EXPORT_DEF
 

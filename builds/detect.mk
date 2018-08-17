@@ -3,7 +3,7 @@
 #
 
 
-# Copyright 1996-2015 by
+# Copyright 1996-2000, 2001, 2002, 2003, 2006 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # This file is part of the FreeType project, and may only be used, modified,
@@ -17,8 +17,8 @@
 # the following variables:
 #
 #   BUILD_DIR    The configuration and system-specific directory.  Usually
-#                `builds/$(PLATFORM)' but can be different for custom builds
-#                of the library.
+#                `freetype/builds/$(PLATFORM)' but can be different for
+#                custom builds of the library.
 #
 # The following variables must be defined in system specific `detect.mk'
 # files:
@@ -124,7 +124,7 @@ std_setup:
 	@echo "\`$(CONFIG_MK)' from this directory then read the INSTALL file for help."
 	@echo ""
 	@echo "Otherwise, simply type \`$(MAKE)' again to build the library,"
-	@echo "or \`$(MAKE) refdoc' to build the API reference (this needs python >= 2.6)."
+	@echo "or \`$(MAKE) refdoc' to build the API reference (the latter needs python)."
 	@echo ""
 	@$(COPY) $(CONFIG_RULES) $(CONFIG_MK)
 
@@ -132,23 +132,23 @@ std_setup:
 # Special case for Dos, Windows, OS/2, where echo "" doesn't work correctly!
 #
 dos_setup:
-	@type builds$(SEP)newline
+	@type builds\newline
 	@echo $(PROJECT_TITLE) build system -- automatic system detection
-	@type builds$(SEP)newline
+	@type builds\newline
 	@echo The following settings are used:
-	@type builds$(SEP)newline
+	@type builds\newline
 	@echo   platformÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ$(PLATFORM)
 	@echo   compilerÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ$(CC)
-	@echo   configuration directoryÿÿÿÿÿÿ$(subst /,$(SEP),$(BUILD_DIR))
-	@echo   configuration rulesÿÿÿÿÿÿÿÿÿÿ$(subst /,$(SEP),$(CONFIG_RULES))
-	@type builds$(SEP)newline
+	@echo   configuration directoryÿÿÿÿÿÿ$(subst /,\,$(BUILD_DIR))
+	@echo   configuration rulesÿÿÿÿÿÿÿÿÿÿ$(subst /,\,$(CONFIG_RULES))
+	@type builds\newline
 	@echo If this does not correspond to your system or settings please remove the file
 	@echo '$(CONFIG_MK)' from this directory then read the INSTALL file for help.
-	@type builds$(SEP)newline
+	@type builds\newline
 	@echo Otherwise, simply type 'make' again to build the library.
-	@echo or 'make refdoc' to build the API reference (this needs python >= 2.6).
-	@type builds$(SEP)newline
-	@$(COPY) $(subst /,$(SEP),$(CONFIG_RULES) $(CONFIG_MK)) > nul
+	@echo or 'make refdoc' to build the API reference (the latter needs python).
+	@type builds\newline
+	@$(COPY) $(subst /,\,$(CONFIG_RULES) $(CONFIG_MK)) > nul
 
 
 # EOF

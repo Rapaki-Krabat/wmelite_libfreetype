@@ -1,7 +1,7 @@
 How to prepare a new release
 ----------------------------
 
-. include/freetype.h:  Update FREETYPE_MAJOR, FREETYPE_MINOR,
+. include/freetype/freetype.h:  Update FREETYPE_MAJOR, FREETYPE_MINOR,
   and FREETYPE_PATCH.
 
 . Update version numbers in all files where necessary (for example, do
@@ -15,70 +15,34 @@ How to prepare a new release
 
 . docs/VERSION.DLL: Document changed `version_info'.
 
-. ChangeLog:   Announce  new  release   (both  in  the  freetype2  and
-  freetype2-demos modules).
+. ChangeLog: Announce  new release  (both in  freetype2  and  ft2demos
+  modules).
 
-. Clone the git archive to another directory with
+. Tag the CVS (freetype2, ft2demos).
 
-    git clone -l -s . ../freetype2.test
+  TODO: Tag the home page CVS on savannah.nongnu.org.
 
-  or something like this and run
-
-    make distclean; make devel; make
-    make distclean; make devel; make multi
-    make distclean; make devel CC=g++; make CC=g++
-    make distclean; make devel CC=g++; make multi CC=g++
-
-    sh autogen.sh
-    make distclean; ./configure; make
-    make distclean; ./configure CC=g++; make
-
-  in the cloned repository to test compilation with both gcc and g++.
-
-. Test C++ compilation  for freetype2-demos too  (using `git clone' as
-  above).
-
-. Run  src/tools/chktrcmp.py  and check  that there  are no  undefined
-  trace_XXXX macros.
-
-. After pushing the new release,  tag the git repositories (freetype2,
-  freetype2-demos) with
-
-    git tag VER-<version> -m "" -u <committer>
-
-  and push the tags with
-
-    git push --tags
-
-. Check with
-
-    git clean -ndx
-
-  that the git directory is really clean  (and remove extraneous files
-  if necessary).
-
-. Say `make  dist' in both the  freetype2 and freetype2-demos  modules
-  to generate the .tar.gz, .tar.bz2, and .zip files.
+. Say `make  dist'  in both  the  freetype2 and  ft2demos  modules  to
+  generate the .tar.gz, .tar.bz2, and .zip files.
 
 . Create     the     doc    bundles    (freetype-doc-<version>.tar.gz,
   freetype-doc-<version>.tar.bz2,    ftdoc<version>.zip).    This   is
-  everything in
+  everything below
 
-    <freetype-web git repository>/freetype2/docs
+    freetype.freedesktop.org:/srv/freetype.freedesktop.org/www/freetype2/docs/
 
   except the `reference' subdirectory.   Do *not* use option `-l' from
   zip!
 
-. Run the following script (with updated `$VERSION', `$SAVANNAH_USER',
-  and $SOURCEFORGE_USER  variables) to sign and upload the  bundles to
-  both Savannah and SourceForge.  The signing code has been taken from
-  the `gnupload' script (part of the automake bundle).
+  Run   the   following   script    (with   updated   `$VERSION'   and
+  `$SAVANNAH_USER'  variables) to sign and upload  the bundles to both
+  Savannah and SourceForge.  The signing code  has been taken from the
+  `gnupload' script (part of the automake bundle).
 
     #!/bin/sh
 
-    VERSION=2.5.1
+    VERSION=2.3.1
     SAVANNAH_USER=wl
-    SOURCEFORGE_USER=wlemb
 
     #####################################################################
 
@@ -86,19 +50,22 @@ How to prepare a new release
 
     version=`echo $VERSION | sed "s/\\.//g"`
 
-    FREETYPE_PACKAGES="freetype-$VERSION.tar.gz \
-                       freetype-$VERSION.tar.bz2 \
-                       ft$version.zip"
-    FT2DEMOS_PACKAGES="ft2demos-$VERSION.tar.gz \
-                       ft2demos-$VERSION.tar.bz2 \
-                       ftdmo$version.zip"
-    FTDOC_PACKAGES="freetype-doc-$VERSION.tar.gz \
-                    freetype-doc-$VERSION.tar.bz2 \
-                    ftdoc$version.zip"
+    UNIX_PACKAGES="freetype ft2demos freetype-doc"
+    WINDOWS_PACKAGES="ft ftdmo ftdoc"
+    UNIX_ZIP="tar.gz tar.bz2"
+    WINDOWS_ZIP="zip"
 
-    PACKAGE_LIST="$FREETYPE_PACKAGES \
-                  $FT2DEMOS_PACKAGES \
-                  $FTDOC_PACKAGES"
+    PACKAGE_LIST=
+    for i in $UNIX_PACKAGES; do
+      for j in $UNIX_ZIP; do
+        PACKAGE_LIST="$PACKAGE_LIST $i-$VERSION.$j"
+      done
+    done
+    for i in $WINDOWS_PACKAGES; do
+      for j in $WINDOWS_ZIP; do
+        PACKAGE_LIST="$PACKAGE_LIST $i$version.$j"
+      done
+    done
 
     set -e
     unset passphrase
@@ -124,72 +91,54 @@ How to prepare a new release
       echo $passphrase | $GPG --passphrase-fd 0 -ba -o $f.sig $f
     done
 
-    FREETYPE_SIGNATURES=
-    for i in $FREETYPE_PACKAGES; do
-      FREETYPE_SIGNATURES="$FREETYPE_SIGNATURES $i.sig"
+    SIGNATURE_LIST=
+    for i in $PACKAGE_LIST; do
+      SIGNATURE_LIST="$SIGNATURE_LIST $i.sig"
     done
-
-    FT2DEMOS_SIGNATURES=
-    for i in $FT2DEMOS_PACKAGES; do
-      FT2DEMOS_SIGNATURES="$FT2DEMOS_SIGNATURES $i.sig"
-    done
-
-    FTDOC_SIGNATURES=
-    for i in $FTDOC_PACKAGES; do
-      FTDOC_SIGNATURES="$FTDOC_SIGNATURES $i.sig"
-    done
-
-    SIGNATURE_LIST="$FREETYPE_SIGNATURES \
-                    $FT2DEMOS_SIGNATURES \
-                    $FTDOC_SIGNATURES"
 
     scp $PACKAGE_LIST $SIGNATURE_LIST \
       $SAVANNAH_USER@dl.sv.nongnu.org:/releases/freetype/
 
-    rsync -avP -e ssh $FREETYPE_PACKAGES $FREETYPE_SIGNATURES \
-      $SOURCEFORGE_USER,freetype@frs.sf.net:/home/frs/project/f/fr/freetype/freetype2/$VERSION/
-    rsync -avP -e ssh $FT2DEMOS_PACKAGES $FT2DEMOS_SIGNATURES \
-      $SOURCEFORGE_USER,freetype@frs.sf.net:/home/frs/project/f/fr/freetype/freetype-demos/$VERSION/
-    rsync -avP -e ssh $FTDOC_PACKAGES $FTDOC_SIGNATURES \
-      $SOURCEFORGE_USER,freetype@frs.sf.net:/home/frs/project/f/fr/freetype/freetype-docs/$VERSION/
+    for f in $PACKAGE_LIST $SIGNATURE_LIST; do
+      ncftpput upload.sf.net /incoming $f
+    done
 
     # EOF
 
-. Prepare a  README for SourceForge  and upload it  with the following
-  script (with updated `$VERSION' and $SOURCEFORGE_USER variables).
+. While files on savannah.gnu.org are automatically moved to the right
+  directory, it must be done manually on SourceForge.  Do that now.
 
-    #!/bin/sh
-
-    VERSION=2.5.1
-    SOURCEFORGE_USER=wlemb
-
-    #####################################################################
-
-    rsync -avP -e ssh README \
-      $SOURCEFORGE_USER,freetype@frs.sf.net:/home/frs/project/f/fr/freetype/freetype2/$VERSION/
-
-    # EOF
-
-. On   SourceForge,   tag   the    just   uploaded   `ftXXX.zip'   and
-  `freetype-XXX.tar.bz2'  files as the  default files to  download for
-  `Windows' and `Others', respectively.
+. Update the FreeType release notes on SourceForge.
 
 . Copy the reference files (generated by `make dist') to
 
-    <freetype-web git repository>/freetype2/docs/reference
+    freetype.freedesktop.org:/srv/freetype.freedesktop.org/www/freetype2/docs/reference
 
-. Update the `freetype-web' repository.  `git push' then automatically
-  triggers an update  of the public web pages  within ten minutes, due
-  to a cron script (on wl@freedesktop.org) that rsyncs with
+  and
 
-    freedesktop.org://srv/freetype.freedesktop.org/www
+    shell.sf.net:/home/groups/f/fr/freetype/htdocs/freetype2/docs/reference
+
+  TODO: Create  FreeType  home  page  CVS  on savannah.nongnu.org  and
+        update it accordingly.
+
+        Write script to automatically do this.
+
+        Mirror FreeType's savannah home page everywhere.
+
+. Update
+
+    freetype.freedesktop.org:/srv/freetype.freedesktop.org/www/index2.html
+
+  and copy it to
+
+    shell.sf.net:/home/groups/f/fr/freetype/htdocs/index2.html
 
 . Announce new release on freetype-announce@nongnu.org and to relevant
   newsgroups.
 
 ----------------------------------------------------------------------
 
-Copyright 2003-2015 by
+Copyright 2003, 2005, 2006, 2007 by
 David Turner, Robert Wilhelm, and Werner Lemberg.
 
 This  file is  part of  the FreeType  project, and  may only  be used,

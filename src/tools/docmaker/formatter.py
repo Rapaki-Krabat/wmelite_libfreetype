@@ -1,40 +1,23 @@
+#  Formatter (c) 2002, 2004, 2007 David Turner <david@freetype.org>
 #
-#  formatter.py
-#
-#    Convert parsed content blocks to a structured document (library file).
-#
-#  Copyright 2002-2015 by
-#  David Turner.
-#
-#  This file is part of the FreeType project, and may only be used,
-#  modified, and distributed under the terms of the FreeType project
-#  license, LICENSE.TXT.  By continuing to use, modify, or distribute
-#  this file you indicate that you have read the license and
-#  understand and accept it fully.
-
-#
-# This is the base Formatter class.  Its purpose is to convert a content
-# processor's data into specific documents (i.e., table of contents, global
-# index, and individual API reference indices).
-#
-# You need to sub-class it to output anything sensible.  For example, the
-# file `tohtml.py' contains the definition of the `HtmlFormatter' sub-class
-# to output HTML.
-#
-
 
 from sources import *
 from content import *
 from utils   import *
 
+# This is the base Formatter class.  Its purpose is to convert
+# a content processor's data into specific documents (i.e., table of
+# contents, global index, and individual API reference indices).
+#
+# You need to sub-class it to output anything sensible.  For example,
+# the file tohtml.py contains the definition of the HtmlFormatter sub-class
+# used to output -- you guessed it -- HTML.
+#
 
-################################################################
-##
-##  FORMATTER CLASS
-##
-class  Formatter:
+class Formatter:
 
-    def  __init__( self, processor ):
+    def __init__( self, processor ):
+
         self.processor   = processor
         self.identifiers = {}
         self.chapters    = processor.chapters
@@ -42,7 +25,7 @@ class  Formatter:
         self.block_index = []
 
         # store all blocks in a dictionary
-        self.blocks = []
+        self.blocks      = []
         for section in self.sections:
             for block in section.blocks.values():
                 self.add_identifier( block.name, block )
@@ -53,24 +36,26 @@ class  Formatter:
                         for field in markup.fields:
                             self.add_identifier( field.name, block )
 
-        self.block_index = self.identifiers.keys()
-        self.block_index.sort( key = index_key )
 
-    def  add_identifier( self, name, block ):
-        if name in self.identifiers:
-            # duplicate name!
-            sys.stderr.write( "WARNING: duplicate definition for"
-                              + " '" + name + "' "
-                              + "in " + block.location() + ", "
-                              + "previous definition in "
-                              + self.identifiers[name].location()
-                              + "\n" )
+        self.block_index = self.identifiers.keys()
+        self.block_index.sort( index_sort )
+
+
+    def add_identifier( self, name, block ):
+        if self.identifiers.has_key( name ):
+            # duplicate name !!
+            sys.stderr.write( \
+               "WARNING: duplicate definition for '" + name + "' in " + \
+               block.location() + ", previous definition in " +         \
+               self.identifiers[ name ].location() + "\n" )
         else:
             self.identifiers[name] = block
 
+
     #
-    # formatting the table of contents
+    #  Formatting the table of contents
     #
+
     def  toc_enter( self ):
         pass
 
@@ -93,6 +78,7 @@ class  Formatter:
         pass
 
     def  toc_dump( self, toc_filename = None, index_filename = None ):
+
         output = None
         if toc_filename:
             output = open_output( toc_filename )
@@ -107,7 +93,7 @@ class  Formatter:
                 self.toc_section_enter( section )
                 self.toc_section_exit( section )
 
-            self.toc_chapter_exit( chap )
+            self.toc_chapter_exit ( chap )
 
         self.toc_index( index_filename )
 
@@ -117,8 +103,9 @@ class  Formatter:
             close_output( output )
 
     #
-    # formatting the index
+    #  Formatting the index
     #
+
     def  index_enter( self ):
         pass
 
@@ -132,6 +119,7 @@ class  Formatter:
         pass
 
     def  index_dump( self, index_filename = None ):
+
         output = None
         if index_filename:
             output = open_output( index_filename )
@@ -140,7 +128,7 @@ class  Formatter:
 
         for name in self.block_index:
             self.index_name_enter( name )
-            self.index_name_exit( name )
+            self.index_name_exit ( name )
 
         self.index_exit()
 
@@ -148,7 +136,7 @@ class  Formatter:
             close_output( output )
 
     #
-    # formatting a section
+    #  Formatting a section
     #
     def  section_enter( self, section ):
         pass
@@ -174,7 +162,9 @@ class  Formatter:
     def  section_exit( self, section ):
         pass
 
+
     def  section_dump( self, section, section_filename = None ):
+
         output = None
         if section_filename:
             output = open_output( section_filename )
@@ -182,42 +172,33 @@ class  Formatter:
         self.section_enter( section )
 
         for name in section.block_names:
-            skip_entry = 0
-            try:
-                block = self.identifiers[name]
-                # `block_names' can contain field names also,
-                # which we filter out
-                for markup in block.markups:
-                    if markup.tag == 'values':
-                        for field in markup.fields:
-                            if field.name == name:
-                                skip_entry = 1
-            except:
-                skip_entry = 1   # this happens e.g. for `/empty/' entries
-
-            if skip_entry:
-              continue
-
+            block = self.identifiers[ name ]
             self.block_enter( block )
 
-            for markup in block.markups[1:]:   # always ignore first markup!
+            for markup in block.markups[1:]:   # always ignore first markup !!
                 self.markup_enter( markup, block )
 
                 for field in markup.fields:
                     self.field_enter( field, markup, block )
-                    self.field_exit( field, markup, block )
+
+                    self.field_exit ( field, markup, block )
 
                 self.markup_exit( markup, block )
 
             self.block_exit( block )
 
-        self.section_exit( section )
+        self.section_exit ( section )
 
         if output:
             close_output( output )
 
-    def  section_dump_all( self ):
+
+    def section_dump_all( self ):
         for section in self.sections:
             self.section_dump( section )
+
+    #
+    #  Formatting a block
+    #
 
 # eof

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    AFM support for Type 1 fonts (body).                                 */
 /*                                                                         */
-/*  Copyright 1996-2015 by                                                 */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -18,10 +18,9 @@
 
 #include <ft2build.h>
 #include "t1afm.h"
-#include FT_INTERNAL_DEBUG_H
+#include "t1errors.h"
 #include FT_INTERNAL_STREAM_H
 #include FT_INTERNAL_POSTSCRIPT_AUX_H
-#include "t1errors.h"
 
 
   /*************************************************************************/
@@ -51,16 +50,12 @@
   /* read a glyph name and return the equivalent glyph index */
   static FT_Int
   t1_get_index( const char*  name,
-                FT_Offset    len,
+                FT_UInt      len,
                 void*        user_data )
   {
     T1_Font  type1 = (T1_Font)user_data;
     FT_Int   n;
 
-
-    /* PS string/name length must be < 16-bit */
-    if ( len > 0xFFFFU )
-      return 0;
 
     for ( n = 0; n < type1->num_glyphs; n++ )
     {
@@ -93,12 +88,7 @@
     FT_ULong  index2 = KERN_INDEX( pair2->index1, pair2->index2 );
 
 
-    if ( index1 > index2 )
-      return 1;
-    else if ( index1 < index2 )
-      return -1;
-    else
-      return 0;
+    return (int)( index1 - index2 );
   }
 
 
@@ -108,7 +98,7 @@
                FT_Stream     stream,
                AFM_FontInfo  fi )
   {
-    FT_Error      error  = FT_Err_Ok;
+    FT_Error      error = T1_Err_Ok;
     FT_Memory     memory = stream->memory;
     FT_Byte*      start;
     FT_Byte*      limit;
@@ -122,13 +112,14 @@
 
     start = (FT_Byte*)stream->cursor;
     limit = (FT_Byte*)stream->limit;
+    p     = start;
 
     /* Figure out how long the width table is.          */
     /* This info is a little-endian short at offset 99. */
     p = start + 99;
     if ( p + 2 > limit )
     {
-      error = FT_THROW( Unknown_File_Format );
+      error = T1_Err_Unknown_File_Format;
       goto Exit;
     }
     width_table_length = FT_PEEK_USHORT_LE( p );
@@ -148,7 +139,7 @@
 
     if ( p + 2 > limit )
     {
-      error = FT_THROW( Unknown_File_Format );
+      error = T1_Err_Unknown_File_Format;
       goto Exit;
     }
 
@@ -156,7 +147,7 @@
     p += 2;
     if ( p + 4 * fi->NumKernPair > limit )
     {
-      error = FT_THROW( Unknown_File_Format );
+      error = T1_Err_Unknown_File_Format;
       goto Exit;
     }
 
@@ -169,8 +160,8 @@
       goto Exit;
 
     /* now, read each kern pair */
-    kp    = fi->KernPairs;
-    limit = p + 4 * fi->NumKernPair;
+    kp             = fi->KernPairs;
+    limit          = p + 4 * fi->NumKernPair;
 
     /* PFM kerning data are stored by encoding rather than glyph index, */
     /* so find the PostScript charmap of this font and install it       */
@@ -235,10 +226,10 @@
                    FT_Stream  stream )
   {
     PSAux_Service  psaux;
-    FT_Memory      memory  = stream->memory;
+    FT_Memory      memory = stream->memory;
     AFM_ParserRec  parser;
-    AFM_FontInfo   fi      = NULL;
-    FT_Error       error   = FT_ERR( Unknown_File_Format );
+    AFM_FontInfo   fi;
+    FT_Error       error = T1_Err_Unknown_File_Format;
     T1_Font        t1_font = &( (T1_Face)t1_face )->type1;
 
 
@@ -251,7 +242,7 @@
     fi->Descender = t1_font->font_bbox.yMin;
 
     psaux = (PSAux_Service)( (T1_Face)t1_face )->psaux;
-    if ( psaux->afm_parser_funcs )
+    if ( psaux && psaux->afm_parser_funcs )
     {
       error = psaux->afm_parser_funcs->init( &parser,
                                              stream->memory,
@@ -269,7 +260,7 @@
       }
     }
 
-    if ( FT_ERR_EQ( error, Unknown_File_Format ) )
+    if ( error == T1_Err_Unknown_File_Format )
     {
       FT_Byte*  start = stream->cursor;
 
@@ -285,15 +276,13 @@
     {
       t1_font->font_bbox = fi->FontBBox;
 
-      t1_face->bbox.xMin =   fi->FontBBox.xMin            >> 16;
-      t1_face->bbox.yMin =   fi->FontBBox.yMin            >> 16;
-      /* no `U' suffix here to 0xFFFF! */
-      t1_face->bbox.xMax = ( fi->FontBBox.xMax + 0xFFFF ) >> 16;
-      t1_face->bbox.yMax = ( fi->FontBBox.yMax + 0xFFFF ) >> 16;
+      t1_face->bbox.xMin =   fi->FontBBox.xMin             >> 16;
+      t1_face->bbox.yMin =   fi->FontBBox.yMin             >> 16;
+      t1_face->bbox.xMax = ( fi->FontBBox.xMax + 0xFFFFU ) >> 16;
+      t1_face->bbox.yMax = ( fi->FontBBox.yMax + 0xFFFFU ) >> 16;
 
-      /* no `U' suffix here to 0x8000! */
-      t1_face->ascender  = (FT_Short)( ( fi->Ascender  + 0x8000 ) >> 16 );
-      t1_face->descender = (FT_Short)( ( fi->Descender + 0x8000 ) >> 16 );
+      t1_face->ascender  = (FT_Short)( ( fi->Ascender  + 0x8000U ) >> 16 );
+      t1_face->descender = (FT_Short)( ( fi->Descender + 0x8000U ) >> 16 );
 
       if ( fi->NumKernPair )
       {
@@ -362,11 +351,11 @@
                         FT_Fixed*  kerning )
   {
     AFM_FontInfo  fi = (AFM_FontInfo)( (T1_Face)face )->afm_data;
-    FT_UInt       i;
+    FT_Int        i;
 
 
     if ( !fi )
-      return FT_THROW( Invalid_Argument );
+      return T1_Err_Invalid_Argument;
 
     for ( i = 0; i < fi->NumTrackKern; i++ )
     {
@@ -389,7 +378,7 @@
       }
     }
 
-    return FT_Err_Ok;
+    return T1_Err_Ok;
   }
 
 

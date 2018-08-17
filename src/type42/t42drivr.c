@@ -4,8 +4,7 @@
 /*                                                                         */
 /*    High-level Type 42 driver interface (body).                          */
 /*                                                                         */
-/*  Copyright 2002-2015 by                                                 */
-/*  Roberto Alameda.                                                       */
+/*  Copyright 2002, 2003, 2004, 2006, 2007 by Roberto Alameda.             */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
@@ -41,7 +40,7 @@
 #include "t42error.h"
 #include FT_INTERNAL_DEBUG_H
 
-#include FT_SERVICE_FONT_FORMAT_H
+#include FT_SERVICE_XFREE86_NAME_H
 #include FT_SERVICE_GLYPH_DICT_H
 #include FT_SERVICE_POSTSCRIPT_NAME_H
 #include FT_SERVICE_POSTSCRIPT_INFO_H
@@ -50,11 +49,11 @@
 #define FT_COMPONENT  trace_t42
 
 
-  /*
-   *
-   *  GLYPH DICT SERVICE
-   *
-   */
+ /*
+  *
+  *  GLYPH DICT SERVICE
+  *
+  */
 
   static FT_Error
   t42_get_glyph_name( T42_Face    face,
@@ -64,7 +63,7 @@
   {
     FT_STRCPYN( buffer, face->type1.glyph_names[glyph_index], buffer_max );
 
-    return FT_Err_Ok;
+    return T42_Err_Ok;
   }
 
 
@@ -72,13 +71,13 @@
   t42_get_name_index( T42_Face    face,
                       FT_String*  glyph_name )
   {
-    FT_Int  i;
+    FT_Int      i;
+    FT_String*  gname;
 
 
     for ( i = 0; i < face->type1.num_glyphs; i++ )
     {
-      FT_String*  gname = face->type1.glyph_names[i];
-
+      gname = face->type1.glyph_names[i];
 
       if ( glyph_name[0] == gname[0] && !ft_strcmp( glyph_name, gname ) )
         return (FT_UInt)ft_atol( (const char *)face->type1.charstrings[i] );
@@ -95,11 +94,11 @@
   };
 
 
-  /*
-   *
-   *  POSTSCRIPT NAME SERVICE
-   *
-   */
+ /*
+  *
+  *  POSTSCRIPT NAME SERVICE
+  *
+  */
 
   static const char*
   t42_get_ps_font_name( T42_Face  face )
@@ -114,29 +113,18 @@
   };
 
 
-  /*
-   *
-   *  POSTSCRIPT INFO SERVICE
-   *
-   */
+ /*
+  *
+  *  POSTSCRIPT INFO SERVICE
+  *
+  */
 
   static FT_Error
   t42_ps_get_font_info( FT_Face          face,
                         PS_FontInfoRec*  afont_info )
   {
     *afont_info = ((T42_Face)face)->type1.font_info;
-
-    return FT_Err_Ok;
-  }
-
-
-  static FT_Error
-  t42_ps_get_font_extra( FT_Face           face,
-                         PS_FontExtraRec*  afont_extra )
-  {
-    *afont_extra = ((T42_Face)face)->type1.font_extra;
-
-    return FT_Err_Ok;
+    return T42_Err_Ok;
   }
 
 
@@ -144,7 +132,6 @@
   t42_ps_has_glyph_names( FT_Face  face )
   {
     FT_UNUSED( face );
-
     return 1;
   }
 
@@ -154,42 +141,39 @@
                            PS_PrivateRec*  afont_private )
   {
     *afont_private = ((T42_Face)face)->type1.private_dict;
-
-    return FT_Err_Ok;
+    return T42_Err_Ok;
   }
 
 
   static const FT_Service_PsInfoRec  t42_service_ps_info =
   {
     (PS_GetFontInfoFunc)   t42_ps_get_font_info,
-    (PS_GetFontExtraFunc)  t42_ps_get_font_extra,
     (PS_HasGlyphNamesFunc) t42_ps_has_glyph_names,
-    (PS_GetFontPrivateFunc)t42_ps_get_font_private,
-    (PS_GetFontValueFunc)  NULL             /* not implemented */
+    (PS_GetFontPrivateFunc)t42_ps_get_font_private
   };
 
 
-  /*
-   *
-   *  SERVICE LIST
-   *
-   */
+ /*
+  *
+  *  SERVICE LIST
+  *
+  */
 
   static const FT_ServiceDescRec  t42_services[] =
   {
     { FT_SERVICE_ID_GLYPH_DICT,           &t42_service_glyph_dict },
     { FT_SERVICE_ID_POSTSCRIPT_FONT_NAME, &t42_service_ps_font_name },
     { FT_SERVICE_ID_POSTSCRIPT_INFO,      &t42_service_ps_info },
-    { FT_SERVICE_ID_FONT_FORMAT,          FT_FONT_FORMAT_TYPE_42 },
+    { FT_SERVICE_ID_XF86_NAME,            FT_XF86_FORMAT_TYPE_42 },
     { NULL, NULL }
   };
 
 
-  FT_CALLBACK_DEF( FT_Module_Interface )
-  T42_Get_Interface( FT_Module         module,
+  static FT_Module_Interface
+  T42_Get_Interface( FT_Driver         driver,
                      const FT_String*  t42_interface )
   {
-    FT_UNUSED( module );
+    FT_UNUSED( driver );
 
     return ft_service_list_lookup( t42_services, t42_interface );
   }
@@ -214,30 +198,34 @@
 
       0,    /* format interface */
 
-      T42_Driver_Init,
-      T42_Driver_Done,
-      T42_Get_Interface,
+      (FT_Module_Constructor)T42_Driver_Init,
+      (FT_Module_Destructor) T42_Driver_Done,
+      (FT_Module_Requester)  T42_Get_Interface,
     },
 
     sizeof ( T42_FaceRec ),
     sizeof ( T42_SizeRec ),
     sizeof ( T42_GlyphSlotRec ),
 
-    T42_Face_Init,
-    T42_Face_Done,
-    T42_Size_Init,
-    T42_Size_Done,
-    T42_GlyphSlot_Init,
-    T42_GlyphSlot_Done,
+    (FT_Face_InitFunc)        T42_Face_Init,
+    (FT_Face_DoneFunc)        T42_Face_Done,
+    (FT_Size_InitFunc)        T42_Size_Init,
+    (FT_Size_DoneFunc)        T42_Size_Done,
+    (FT_Slot_InitFunc)        T42_GlyphSlot_Init,
+    (FT_Slot_DoneFunc)        T42_GlyphSlot_Done,
 
-    T42_GlyphSlot_Load,
+#ifdef FT_CONFIG_OPTION_OLD_INTERNALS
+    ft_stub_set_char_sizes,
+    ft_stub_set_pixel_sizes,
+#endif
+    (FT_Slot_LoadFunc)        T42_GlyphSlot_Load,
 
-    0,                 /* FT_Face_GetKerningFunc  */
-    0,                 /* FT_Face_AttachFunc      */
+    (FT_Face_GetKerningFunc)  0,
+    (FT_Face_AttachFunc)      0,
 
-    0,                 /* FT_Face_GetAdvancesFunc */
-    T42_Size_Request,
-    T42_Size_Select
+    (FT_Face_GetAdvancesFunc) 0,
+    (FT_Size_RequestFunc)     T42_Size_Request,
+    (FT_Size_SelectFunc)      T42_Size_Select
   };
 
 

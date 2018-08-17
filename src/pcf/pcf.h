@@ -2,7 +2,7 @@
 
   FreeType font driver for pcf fonts
 
-  Copyright (C) 2000, 2001, 2002, 2003, 2006, 2010 by
+  Copyright (C) 2000, 2001, 2002, 2003, 2006 by
   Francesco Zappa Nardelli
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -72,8 +72,8 @@ FT_BEGIN_HEADER
     union
     {
       FT_String*  atom;
-      FT_Long     l;
-      FT_ULong    ul;
+      FT_Long     integer;
+      FT_ULong    cardinal;
 
     } value;
 
@@ -136,8 +136,8 @@ FT_BEGIN_HEADER
   {
     FT_FaceRec     root;
 
-    FT_StreamRec   comp_stream;
-    FT_Stream      comp_source;
+    FT_StreamRec   gzip_stream;
+    FT_Stream      gzip_source;
 
     char*          charset_encoding;
     char*          charset_registry;
@@ -148,9 +148,9 @@ FT_BEGIN_HEADER
     int            nprops;
     PCF_Property   properties;
 
-    FT_ULong       nmetrics;
+    FT_Long        nmetrics;
     PCF_Metric     metrics;
-    FT_ULong       nencodings;
+    FT_Long        nencodings;
     PCF_Encoding   encodings;
 
     FT_Short       defaultChar;

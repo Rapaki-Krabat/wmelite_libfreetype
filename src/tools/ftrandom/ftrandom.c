@@ -1,4 +1,4 @@
-/* Copyright (C) 2005, 2007, 2008, 2013 by George Williams */
+/* Copyright (C) 2005 by George Williams */
 /*
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -151,8 +151,8 @@
     int  load_flags = FT_LOAD_DEFAULT;
 
 
-    if ( check_outlines         &&
-         FT_IS_SCALABLE( face ) )
+    if ( check_outlines                               &&
+         ( face->face_flags & FT_FACE_FLAG_SCALABLE ) )
       load_flags = FT_LOAD_NO_BITMAP;
 
     if ( nohints )
@@ -162,8 +162,8 @@
 
     for ( gid = 0; gid < face->num_glyphs; ++gid )
     {
-      if ( check_outlines         &&
-           FT_IS_SCALABLE( face ) )
+      if ( check_outlines                               &&
+           ( face->face_flags & FT_FACE_FLAG_SCALABLE ) )
       {
         if ( !FT_Load_Glyph( face, gid, load_flags ) )
           FT_Outline_Decompose( &face->glyph->outline, &outlinefuncs, NULL );
@@ -184,6 +184,7 @@
   {
     FT_Library  context;
     FT_Face     face;
+    int         i, num;
 
 
     if ( FT_Init_FreeType( &context ) )
@@ -202,9 +203,6 @@
       TestFace( face );
     else
     {
-      int  i, num;
-
-
       num = face->num_faces;
       FT_Done_Face( face );
 
@@ -329,9 +327,12 @@
   FindFonts( char**  fontdirs,
              char**  extensions )
   {
-    int          i, max;
-    char         buffer[1025];
-    struct stat  statb;
+    DIR*            examples;
+    struct dirent*  ent;
+
+    int             i, max;
+    char            buffer[1025];
+    struct stat     statb;
 
 
     max  = 0;
@@ -339,10 +340,6 @@
 
     for ( i = 0; fontdirs[i] != NULL; ++i )
     {
-      DIR*            examples;
-      struct dirent*  ent;
-
-
       examples = opendir( fontdirs[i] );
       if ( examples == NULL )
       {
@@ -449,9 +446,9 @@
       fseek( new, getRandom( 0, item->len - 1 ), SEEK_SET );
 
       if ( item->isbinary )
-        putc( getRandom( 0, 0xFF ), new );
+        putc( getRandom( 0, 0xff ), new );
       else if ( item->isascii )
-        putc( getRandom( 0x20, 0x7E ), new );
+        putc( getRandom( 0x20, 0x7e ), new );
       else
       {
         int  hex = getRandom( 0, 15 );
@@ -558,6 +555,7 @@
         char**  argv )
   {
     char    **dirs, **exts;
+    char    *pt, *end;
     int     dcnt = 0, ecnt = 0, rset = false, allexts = false;
     int     i;
     time_t  now;
@@ -569,10 +567,7 @@
 
     for ( i = 1; i < argc; ++i )
     {
-      char*  pt = argv[i];
-      char*  end;
-
-
+      pt = argv[i];
       if ( pt[0] == '-' && pt[1] == '-' )
         ++pt;
 
@@ -638,21 +633,12 @@
     }
 
     if ( allexts )
-    {
-      free( exts );
       exts = NULL;
-    }
     else if ( ecnt == 0 )
-    {
-      free( exts );
       exts = default_ext_list;
-    }
 
     if ( dcnt == 0 )
-    {
-      free( dirs );
       dirs = default_dir_list;
-    }
 
     if ( testfile != NULL )
       ExecuteTest( testfile );         /* This should never return */

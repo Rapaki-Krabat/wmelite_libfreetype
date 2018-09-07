@@ -404,6 +404,17 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GEG75DQ787;
+				HEADER_SEARCH_PATHS = (
+					../../include/,
+					../../builds/unix/,
+					../../objs/,
+				);
+				OTHER_CFLAGS = (
+					"-DDARWIN_NO_CARBON",
+					"-DFT_CONFIG_CONFIG_H=\"<ftconfig.h>\"",
+					"-DFT2_BUILD_LIBRARY",
+					"-DFT_CONFIG_MODULES_H=\"<ftmodule.h>\"",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -416,6 +427,17 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GEG75DQ787;
+				HEADER_SEARCH_PATHS = (
+					../../include/,
+					../../builds/unix/,
+					../../objs/,
+				);
+				OTHER_CFLAGS = (
+					"-DDARWIN_NO_CARBON",
+					"-DFT_CONFIG_CONFIG_H=\"<ftconfig.h>\"",
+					"-DFT2_BUILD_LIBRARY",
+					"-DFT_CONFIG_MODULES_H=\"<ftmodule.h>\"",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

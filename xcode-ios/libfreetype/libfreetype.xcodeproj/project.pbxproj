@@ -407,7 +407,7 @@
 				HEADER_SEARCH_PATHS = (
 					../../include/,
 					../../builds/unix/,
-					../../objs/,
+					../../generated/,
 				);
 				OTHER_CFLAGS = (
 					"-DDARWIN_NO_CARBON",
@@ -430,7 +430,7 @@
 				HEADER_SEARCH_PATHS = (
 					../../include/,
 					../../builds/unix/,
-					../../objs/,
+					../../generated/,
 				);
 				OTHER_CFLAGS = (
 					"-DDARWIN_NO_CARBON",

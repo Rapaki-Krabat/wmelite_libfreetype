@@ -406,7 +406,6 @@
 				DEVELOPMENT_TEAM = GEG75DQ787;
 				HEADER_SEARCH_PATHS = (
 					../../include/,
-					../../builds/unix/,
 					../../generated/,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -431,7 +430,6 @@
 				DEVELOPMENT_TEAM = GEG75DQ787;
 				HEADER_SEARCH_PATHS = (
 					../../include/,
-					../../builds/unix/,
 					../../generated/,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;

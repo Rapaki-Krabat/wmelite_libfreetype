@@ -1,7 +1,7 @@
 #!/bin/bash
 
 emconfigure ./configure --without-zlib --without-png --without-bzip2 \
---enable-shared=yes --enable-static=no --with-harfbuzz=no CFLAGS="-O2"
+--enable-shared=no --enable-static=yes --with-harfbuzz=no CFLAGS="-O2"
 
 # workaround: build the host executable manually
 mkdir -p objs

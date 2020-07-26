@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TARGET=i586-mingw32msvc
+TARGET=i686-w64-mingw32
 
 ./configure --without-zlib --without-png --without-bzip2 \
 '--enable-static=no' \

@@ -202,6 +202,8 @@ add_library(freetype
   ${BASE_SRCS}
 )
 
+target_include_directories(freetype PUBLIC include/)
+
 if (BUILD_FRAMEWORK)
   set_property(SOURCE ${PUBLIC_CONFIG_HEADERS}
     PROPERTY MACOSX_PACKAGE_LOCATION Headers/config

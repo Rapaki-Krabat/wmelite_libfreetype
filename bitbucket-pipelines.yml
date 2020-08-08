@@ -1,0 +1,26 @@
+image: hcdaniel/debian10build:latest
+pipelines:
+  default:
+    - step:
+        name: GCC build
+        script:
+          - mkdir -p build/gcc
+          - cd build/gcc
+          - cmake -DCMAKE_TOOLCHAIN_FILE=/toolchain-gcc.cmake ../../
+          - make
+    - step:
+        name: MinGW64 build
+        script:
+          - mkdir -p build/mingw64/
+          - cd build/mingw64/
+          - cmake -DCMAKE_TOOLCHAIN_FILE=/toolchain-mingw64.cmake ../../
+          - make
+    - step:
+        name: Clang build
+        script:
+          - mkdir -p build/mingw64/
+          - cd build/mingw64/
+          - cmake -DCMAKE_TOOLCHAIN_FILE=/toolchain-clang.cmake ../../
+          - make
+
+

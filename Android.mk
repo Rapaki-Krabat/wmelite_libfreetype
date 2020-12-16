@@ -230,6 +230,6 @@ LOCAL_CFLAGS += -fPIC -DPIC
 LOCAL_CFLAGS += "-DFT2_BUILD_LIBRARY"
 LOCAL_CFLAGS += -DFT_CONFIG_OPTION_SYSTEM_ZLIB -DFT_CONFIG_CONFIG_H="<ftconfig.h>"
 
-LOCAL_CFLAGS += -O2 -Wall -Wextra -Wcast-align -Wno-unused-parameter -Wno-format -Wno-unused-function -Wno-sign-compare 
+LOCAL_CFLAGS += -O2 -Wall -Wextra -Wno-unused-parameter -Wno-format -Wno-unused-function -Wno-sign-compare 
 
 include $(BUILD_STATIC_LIBRARY)

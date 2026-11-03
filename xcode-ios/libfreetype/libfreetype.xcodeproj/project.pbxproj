@@ -408,7 +408,7 @@
 					../../include/,
 					../../generated/,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				OTHER_CFLAGS = (
 					"-DDARWIN_NO_CARBON",
 					"-DFT_CONFIG_CONFIG_H=\"<ftconfig.h>\"",
@@ -432,7 +432,7 @@
 					../../include/,
 					../../generated/,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				OTHER_CFLAGS = (
 					"-DDARWIN_NO_CARBON",
 					"-DFT_CONFIG_CONFIG_H=\"<ftconfig.h>\"",

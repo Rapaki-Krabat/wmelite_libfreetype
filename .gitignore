@@ -2,3 +2,5 @@ vs2017_uwp/libfreetype/ARM/
 vs2017_uwp/libfreetype/Debug/
 vs2017_uwp/libfreetype/Release/
 vs2017_uwp/libfreetype/x64/
+vs2017_uwp/libfreetype/ARM64/
+vs2017_uwp/libfreetype/libfreetype/
